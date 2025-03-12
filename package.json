@@ -1,0 +1,26 @@
+{
+  "name": "value_averaging",
+  "version": "0.0.1",
+  "description": "The Value Averaging strategy implemented in NodeJs",
+  "keywords": [
+    "binance",
+    "crypto",
+    "finance",
+    "websocket"
+  ],
+  "homepage": "https://github.com/gputignano/value-averaging#readme",
+  "bugs": {
+    "url": "https://github.com/gputignano/value-averaging/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gputignano/value-averaging.git"
+  },
+  "license": "ISC",
+  "author": "Giovanni Putignano",
+  "type": "module",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
