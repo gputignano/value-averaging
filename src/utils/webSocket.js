@@ -1,4 +1,5 @@
 import WebSocket from "ws";
+import { sessionLogon } from "./functions.js";
 
 const WS_STATES = {
   CONNECTING: WebSocket.CONNECTING,
@@ -79,8 +80,9 @@ export const createWebSocketConnection = (
 
       if (!wasConnectedBefore) {
         wasConnectedBefore = true;
+        if (options.sessionLogon) ws.send(sessionLogon());
         onConnected();
-      }
+      };
     });
 
     ws.on("message", (data, isBinary) => {
