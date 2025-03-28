@@ -9,7 +9,7 @@ export const createWebSocket = (url) => {
 
     ws.on("open", () => {
       console.log(`${new Date().toLocaleString()} ✅ WebSocket connesso`);
-      listeners.forEach((handler, event) => ws.on(event, handler));
+      // listeners.forEach((handler, event) => ws.on(event, handler));
     });
 
     ws.on("ping", (data) => ws.pong(data));
