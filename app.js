@@ -31,17 +31,17 @@ const last_trade = {
 
 const ws_api = createBinanceSocket(WEBSOCKET_API_ENDPOINT);
 
-ws_api.getSocket().on("close", (code, reason) => console.log(code, reason.toString(), "ws_api closed"));
+ws_api.on("close", (code, reason) => console.log(code, reason.toString(), "ws_api closed"));
 
-ws_api.getSocket().on("open", () => {
+ws_api.on("open", () => {
   console.log("ws_api: open");
 
   ws_api.send(sessionLogon(ED25519_API_KEY, ED25519_PRIVATE_KEY));
 });
 
-ws_api.getSocket().on("error", (error) => console.error(error));
+ws_api.on("error", (error) => console.error(error));
 
-ws_api.getSocket().on("message", (data) => {
+ws_api.on("message", (data) => {
   const parsedData = JSON.parse(data);
 
   switch (parsedData.id) {
@@ -83,9 +83,9 @@ ws_api.getSocket().on("message", (data) => {
 
       const ws_stream = createBinanceSocket(WEBSOCKET_STREAM_ENDPOINT);
 
-      ws_stream.getSocket().on("close", (code, reason) => console.log(code, reason.toString(), "ws_stream closed"));
+      ws_stream.on("close", (code, reason) => console.log(code, reason.toString(), "ws_stream closed"));
 
-      ws_stream.getSocket().on("open", () => {
+      ws_stream.on("open", () => {
         console.log("ws_stream: open");
 
         ws_stream.send(JSON.stringify({
@@ -97,9 +97,9 @@ ws_api.getSocket().on("message", (data) => {
         }));
       });
 
-      ws_stream.getSocket().on("error", (error) => console.error(error));
+      ws_stream.on("error", (error) => console.error(error));
 
-      ws_stream.getSocket().on("message", (data) => {
+      ws_stream.on("message", (data) => {
         const parsedData = JSON.parse(data);
 
         if (parsedData.result === null) return;
