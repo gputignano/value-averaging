@@ -46,43 +46,108 @@ import WebSocket from "ws";
 
 // binanceSocket.js
 
+// export default function createBinanceSocket(url) {
+//   let socket = null;
+//   let reconnectInterval = 5000; // Intervallo di riconnessione (5 secondi)
+//   let manualClose = false; // Flag per indicare la chiusura manuale
+
+//   const connect = () => {
+//     socket = new WebSocket(url);
+
+//     socket.on('open', () => {
+//       console.log('Connessione WebSocket a Binance aperta');
+//       reconnectInterval = 5000; // Resetta l'intervallo di riconnessione
+//       manualClose = false; // Resetta il flag di chiusura manuale
+//     });
+
+//     socket.on('ping', (data) => {
+//       socket.pong(data); // Invia il payload di ping con pong
+//     });
+
+//     socket.on('close', (event) => {
+//       console.log(`Connessione WebSocket chiusa: ${event.code} ${event.reason}`);
+//       if (!manualClose) {
+//         reconnect(); // Riconnetti solo se la chiusura non è manuale
+//       }
+//     });
+
+//     socket.on('error', (error) => {
+//       console.error('Errore WebSocket:', error);
+//       if (!manualClose) {
+//         reconnect(); // Riconnetti solo se la chiusura non è manuale
+//       }
+//     });
+//   };
+
+//   const reconnect = () => {
+//     console.log(`Tentativo di riconnessione in ${reconnectInterval / 1000} secondi...`);
+//     setTimeout(connect, reconnectInterval);
+//     reconnectInterval = Math.min(reconnectInterval * 2, 60000); // Aumenta l'intervallo fino a 60 secondi
+//   };
+
+//   connect();
+
+//   return {
+//     getSocket: () => socket,
+//     send: (data) => {
+//       if (socket && socket.readyState === WebSocket.OPEN) {
+//         socket.send(data);
+//       } else {
+//         console.error('Socket non connesso o non aperto');
+//       }
+//     },
+//     close: () => {
+//       if (socket) {
+//         manualClose = true; // Imposta il flag di chiusura manuale
+//         socket.close();
+//       }
+//     },
+//   };
+// }
+
 export default function createBinanceSocket(url) {
   let socket = null;
-  let reconnectInterval = 5000; // Intervallo di riconnessione (5 secondi)
-  let manualClose = false; // Flag per indicare la chiusura manuale
+  let reconnectInterval = 5000;
+  let manualClose = false;
+  const listeners = {};
 
   const connect = () => {
     socket = new WebSocket(url);
 
-    socket.on('open', () => {
-      console.log('Connessione WebSocket a Binance aperta');
-      reconnectInterval = 5000; // Resetta l'intervallo di riconnessione
-      manualClose = false; // Resetta il flag di chiusura manuale
+    socket.on('open', (event) => {
+      console.log('WebSocket connesso a Binance');
+      reconnectInterval = 5000;
+      manualClose = false;
+      if (listeners['open']) listeners['open'](event);
+    });
+
+    socket.on('message', (data) => {
+      if (listeners['message']) listeners['message'](data);
     });
 
     socket.on('ping', (data) => {
-      socket.pong(data); // Invia il payload di ping con pong
+      // console.log('Ping ricevuto, invio pong...');
+      socket.pong(data); // Rispondi al ping
+      if (listeners['ping']) listeners['ping'](data);
     });
 
-    socket.on('close', (event) => {
-      console.log(`Connessione WebSocket chiusa: ${event.code} ${event.reason}`);
-      if (!manualClose) {
-        reconnect(); // Riconnetti solo se la chiusura non è manuale
-      }
+    socket.on('close', (code, reason) => {
+      console.log(`Connessione chiusa: ${code} ${reason}`);
+      if (listeners['close']) listeners['close']({ code, reason });
+      if (!manualClose) reconnect();
     });
 
     socket.on('error', (error) => {
       console.error('Errore WebSocket:', error);
-      if (!manualClose) {
-        reconnect(); // Riconnetti solo se la chiusura non è manuale
-      }
+      if (listeners['error']) listeners['error'](error);
+      if (!manualClose) reconnect();
     });
   };
 
   const reconnect = () => {
-    console.log(`Tentativo di riconnessione in ${reconnectInterval / 1000} secondi...`);
+    console.log(`Riconnessione in ${reconnectInterval / 1000} secondi...`);
     setTimeout(connect, reconnectInterval);
-    reconnectInterval = Math.min(reconnectInterval * 2, 60000); // Aumenta l'intervallo fino a 60 secondi
+    reconnectInterval = Math.min(reconnectInterval * 2, 60000);
   };
 
   connect();
@@ -98,9 +163,13 @@ export default function createBinanceSocket(url) {
     },
     close: () => {
       if (socket) {
-        manualClose = true; // Imposta il flag di chiusura manuale
+        manualClose = true;
         socket.close();
       }
     },
+    on: (event, handler) => {
+      listeners[event] = handler;
+    },
   };
 }
+
