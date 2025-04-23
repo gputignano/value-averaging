@@ -1,7 +1,7 @@
 import axios from "axios";
 import createBinanceSocket from "./src/utils/webSocket.js";
 import { WEBSOCKET_STREAM_ENDPOINT, WEBSOCKET_API_ENDPOINT, ED25519_API_KEY, ED25519_PRIVATE_KEY, WEB_APP_URL } from "./src/config/config.js";
-import { sessionLogon } from "./src/utils/functions.js";
+import { sessionLogon, getLastTrade } from "./src/utils/functions.js";
 
 const symbol = {
   base: "BTC",
@@ -13,25 +13,7 @@ const price_filter = 0.01000000;
 const lot_size = 0.00001000;
 let isProcessing = false;
 
-const response = await axios.get(WEB_APP_URL);
-
-const last_trade = {
-  side: response.data[0],
-  time: response.data[1],
-  id: response.data[2],
-  price: response.data[3],
-  price_executed: response.data[4],
-  wallet_target: response.data[5], // Set initial value
-  base_required: response.data[6],
-  base_to_buy: response.data[7],
-  base_to_buy_fee: response.data[8],
-  base_owned: response.data[9], // Set initial value
-  quote_spent: response.data[10],
-  quote_spent_fee: response.data[11],
-  quote_spent_sum: response.data[12], // Set initial value
-  delta: response.data[13],
-  buffer: response.data[14] // Set initial value
-};
+const last_trade = await getLastTrade(WEB_APP_URL);
 
 const ws_api = createBinanceSocket(WEBSOCKET_API_ENDPOINT);
 

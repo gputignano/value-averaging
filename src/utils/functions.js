@@ -1,4 +1,5 @@
 import crypto from 'node:crypto';
+import axios from "axios";
 
 export const signature_HMAC_SHA_256 = (queryString, HMAC_SHA_256_SECRET_KEY) =>
   crypto.createHmac('sha256', HMAC_SHA_256_SECRET_KEY)
@@ -37,4 +38,28 @@ export const sessionLogon = (ED25519_API_KEY, ED25519_PRIVATE_KEY) => {
     method: "session.logon",
     params: Object.fromEntries(searchParams)
   });
+};
+
+export const getLastTrade = async (WEB_APP_URL) => {
+  const response = await axios.get(WEB_APP_URL);
+
+  const last_trade = {
+    side: response.data[0],
+    time: response.data[1],
+    id: response.data[2],
+    price: response.data[3],
+    price_executed: response.data[4],
+    wallet_target: response.data[5], // Set initial value
+    base_required: response.data[6],
+    base_to_buy: response.data[7],
+    base_to_buy_fee: response.data[8],
+    base_owned: response.data[9], // Set initial value
+    quote_spent: response.data[10],
+    quote_spent_fee: response.data[11],
+    quote_spent_sum: response.data[12], // Set initial value
+    delta: response.data[13],
+    buffer: response.data[14] // Set initial value
+  };
+
+  return last_trade;
 };
