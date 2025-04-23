@@ -33,8 +33,6 @@ const last_trade = {
   buffer: response.data[14] // Set initial value
 };
 
-console.log(last_trade);
-
 const ws_api = createBinanceSocket(WEBSOCKET_API_ENDPOINT);
 
 ws_api.on("close", (code, reason) => console.log(code, reason?.toString(), "ws_api closed"));
