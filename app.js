@@ -78,7 +78,6 @@ ws_api.on("message", async (data) => {
         last_trade.quote_spent = parseFloat(trade.S === "BUY" ? trade.Z : -trade.Z);
         last_trade.quote_spent_fee = (trade.N === symbol.quote ? parseFloat(trade.n) : 0);
         last_trade.quote_spent_sum += last_trade.quote_spent - last_trade.quote_spent_fee;
-        last_trade.delta = wallet_increment - last_trade.quote_spent;
         last_trade.buffer += last_trade.quote_spent_sum + last_trade.wallet_target;
 
         const response = await axios.post(WEB_APP_URL, {
@@ -95,7 +94,6 @@ ws_api.on("message", async (data) => {
           quote_spent: last_trade.quote_spent,
           quote_spent_fee: last_trade.quote_spent_fee,
           quote_spent_sum: last_trade.quote_spent_sum,
-          delta: last_trade.delta,
           buffer: last_trade.buffer
         });
 
