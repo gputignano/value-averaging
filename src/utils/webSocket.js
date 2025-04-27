@@ -59,7 +59,7 @@ export default function createBinanceSocket(url) {
     },
     close: () => {
       if (socket) {
-        // manualClose = true;
+        manualClose = true;
         socket.close();
       }
     },
