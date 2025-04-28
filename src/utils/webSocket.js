@@ -29,7 +29,7 @@ export default function createBinanceSocket(url) {
 
     socket.on('close', (code, reason) => {
       console.log(`Connessione chiusa: ${code} ${reason}`);
-      if (listeners['close']) listeners['close']({ code, reason });
+      if (listeners['close']) listeners['close'](code, reason);
       if (!manualClose) reconnect();
     });
 
