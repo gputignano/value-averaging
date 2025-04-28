@@ -77,7 +77,7 @@ ws_api.on("message", async (data) => {
         last_trade.quote_spent = parseFloat(trade.S === "BUY" ? trade.Z : -trade.Z);
         last_trade.quote_spent_fee = (trade.N === symbol.quote ? parseFloat(trade.n) : 0);
         last_trade.quote_spent_sum += last_trade.quote_spent - last_trade.quote_spent_fee;
-        last_trade.buffer += last_trade.quote_spent_sum + last_trade.wallet_target;
+        last_trade.buffer = last_trade.wallet_target - last_trade.quote_spent_sum;
 
         const response = await saveTrade(WEB_APP_URL, {
           side: last_trade.side,
