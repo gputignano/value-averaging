@@ -57,8 +57,7 @@ export const getLastTrade = async (WEB_APP_URL) => {
     quote_spent: response.data[10],
     quote_spent_fee: response.data[11],
     quote_spent_sum: response.data[12], // Set initial value
-    delta: response.data[13],
-    buffer: response.data[14] // Set initial value
+    buffer: response.data[13] // Set initial value
   };
 
   return last_trade;
