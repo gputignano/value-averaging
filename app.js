@@ -28,6 +28,7 @@ ws_api.on("error", (error) => console.error(error));
 
 ws_api.on("message", async (data) => {
   const parsedData = JSON.parse(data);
+  if (parsedData.status !== 200) console.error(parsedData.error);
 
   switch (parsedData.id) {
     case "session_logon":
