@@ -16,7 +16,7 @@ const last_trade = await getLastTrade(WEB_APP_URL);
 
 const ws_api = createBinanceSocket(WEBSOCKET_API_ENDPOINT);
 
-ws_api.on("close", (code, reason) => console.log(code, reason?.toString(), "ws_api closed"));
+ws_api.on("close", (code, reason) => console.log(code, reason.toString(), "ws_api closed"));
 
 ws_api.on("open", () => {
   console.log("ws_api: open");
