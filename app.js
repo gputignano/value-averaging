@@ -1,7 +1,6 @@
-import axios from "axios";
 import createBinanceSocket from "./src/utils/webSocket.js";
 import { WEBSOCKET_STREAM_ENDPOINT, WEBSOCKET_API_ENDPOINT, ED25519_API_KEY, ED25519_PRIVATE_KEY, WEB_APP_URL } from "./src/config/config.js";
-import { sessionLogon, getLastTrade } from "./src/utils/functions.js";
+import { sessionLogon, getLastTrade, saveTrade } from "./src/utils/functions.js";
 
 const symbol = {
   base: "BTC",
@@ -80,7 +79,7 @@ ws_api.on("message", async (data) => {
         last_trade.quote_spent_sum += last_trade.quote_spent - last_trade.quote_spent_fee;
         last_trade.buffer += last_trade.quote_spent_sum + last_trade.wallet_target;
 
-        const response = await axios.post(WEB_APP_URL, {
+        const response = await saveTrade(WEB_APP_URL, {
           side: last_trade.side,
           time: last_trade.time,
           id: trade.i,

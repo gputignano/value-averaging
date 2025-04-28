@@ -63,3 +63,9 @@ export const getLastTrade = async (WEB_APP_URL) => {
 
   return last_trade;
 };
+
+export const saveTrade = async (WEB_APP_URL, data) => {
+  const response = await axios.post(WEB_APP_URL, data);
+
+  return response;
+};
