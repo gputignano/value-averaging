@@ -1,5 +1,5 @@
 import createBinanceSocket from "./src/utils/webSocket.js";
-import { WEBSOCKET_STREAM_ENDPOINT, WEBSOCKET_API_ENDPOINT, ED25519_API_KEY, ED25519_PRIVATE_KEY, WEB_APP_URL } from "./src/config/config.js";
+import { WEBSOCKET_STREAM_ENDPOINT, WEBSOCKET_API_ENDPOINT, ED25519_API_KEY, ED25519_PRIVATE_KEY, WEB_APP_URL, DELTA } from "./src/config/config.js";
 import { sessionLogon, getLastTrade, saveTrade, getSymbol } from "./src/utils/functions.js";
 
 const symbol = getSymbol();
@@ -146,7 +146,7 @@ ws_stream.on("message", (data) => {
       const side = base_to_buy > 0 ? "BUY" : "SELL";
       const quote_to_buy = base_to_buy * price;
 
-      if (Math.abs(quote_to_buy) >= min_notional && Math.abs((price - last_trade.price) / last_trade.price) >= 0.01) {
+      if (Math.abs(quote_to_buy) >= min_notional && Math.abs((price - last_trade.price) / last_trade.price) >= DELTA) {
         // Execute the order
 
         isProcessing = true;

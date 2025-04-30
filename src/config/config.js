@@ -18,5 +18,6 @@ export const {
   USER_DATA_STREAM,
   WEB_APP_URL,
   SYMBOL_BASE,
-  SYMBOL_QUOTE
+  SYMBOL_QUOTE,
+  DELTA,
 } = result.parsed;
