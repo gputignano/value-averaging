@@ -1,5 +1,6 @@
 import crypto from 'node:crypto';
 import axios from "axios";
+import { SYMBOL_BASE, SYMBOL_QUOTE } from '../config/config.js';
 
 export const signature_HMAC_SHA_256 = (queryString, HMAC_SHA_256_SECRET_KEY) =>
   crypto.createHmac('sha256', HMAC_SHA_256_SECRET_KEY)
@@ -68,3 +69,8 @@ export const saveTrade = async (WEB_APP_URL, data) => {
 
   return response;
 };
+
+export const getSymbol = () => ({
+  base: SYMBOL_BASE,
+  quote: SYMBOL_QUOTE
+});

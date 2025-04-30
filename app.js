@@ -1,11 +1,8 @@
 import createBinanceSocket from "./src/utils/webSocket.js";
 import { WEBSOCKET_STREAM_ENDPOINT, WEBSOCKET_API_ENDPOINT, ED25519_API_KEY, ED25519_PRIVATE_KEY, WEB_APP_URL } from "./src/config/config.js";
-import { sessionLogon, getLastTrade, saveTrade } from "./src/utils/functions.js";
+import { sessionLogon, getLastTrade, saveTrade, getSymbol } from "./src/utils/functions.js";
 
-const symbol = {
-  base: "BTC",
-  quote: "USDC"
-};
+const symbol = getSymbol();
 const wallet_increment = 0;
 const min_notional = 5;
 const price_filter = 0.01000000;
