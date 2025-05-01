@@ -61,8 +61,6 @@ ws_api.on("message", async (data) => {
       const trade = parsedData.event;
 
       if (trade.X === "FILLED") {
-        last_trade.x = trade.x;
-        last_trade.X = trade.X;
         last_trade.side = trade.S;
         last_trade.time = trade.E;
         last_trade.price = parseFloat(trade.p);
