@@ -144,7 +144,7 @@ ws_stream.on("message", (data) => {
       const side = base_to_buy > 0 ? "BUY" : "SELL";
       const quote_to_buy = base_to_buy * price;
 
-      if (Math.abs(quote_to_buy) >= min_notional && Math.abs((price - last_trade.price) / last_trade.price) >= DELTA) {
+      if (Math.abs(quote_to_buy) >= min_notional && Math.abs((price - last_trade.price_executed) / last_trade.price_executed) >= DELTA) {
         // Execute the order
 
         isProcessing = true;
