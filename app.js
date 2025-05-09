@@ -60,6 +60,8 @@ ws_api.on("message", async (data) => {
     case "executionReport":
       const trade = parsedData.event;
 
+      if (trade.s !== symbol.base + symbol.quote) return;
+
       if (trade.X === "FILLED") {
         last_trade.side = trade.S;
         last_trade.time = trade.E;
