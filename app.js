@@ -70,7 +70,7 @@ ws_api.on("message", async (data) => {
         last_trade.base_to_buy = parseFloat(trade.S === "BUY" ? trade.q : -trade.q);
         last_trade.base_to_buy_fee = (trade.N === symbol.base ? parseFloat(trade.n) : 0);
         last_trade.base_owned += last_trade.base_to_buy - last_trade.base_to_buy_fee;
-        last_trade.quote_spent = parseFloat(trade.S === "BUY" ? trade.Z : -trade.Z);
+        last_trade.quote_spent = parseFloat(trade.S === "BUY" ? -trade.Z : trade.Z);
         last_trade.quote_spent_fee = (trade.N === symbol.quote ? parseFloat(trade.n) : 0);
         last_trade.quote_spent_sum += last_trade.quote_spent - last_trade.quote_spent_fee;
         last_trade.buffer = last_trade.wallet_target + last_trade.quote_spent_sum;
