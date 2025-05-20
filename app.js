@@ -1,9 +1,8 @@
 import createBinanceSocket from "./src/utils/webSocket.js";
-import { WEBSOCKET_STREAM_ENDPOINT, WEBSOCKET_API_ENDPOINT, ED25519_API_KEY, ED25519_PRIVATE_KEY, WEB_APP_URL, DELTA } from "./src/config/config.js";
+import { WEBSOCKET_STREAM_ENDPOINT, WEBSOCKET_API_ENDPOINT, ED25519_API_KEY, ED25519_PRIVATE_KEY, WEB_APP_URL, DELTA, WALLET_INCREMENT } from "./src/config/config.js";
 import { sessionLogon, getLastTrade, saveTrade, getSymbol } from "./src/utils/functions.js";
 
 const symbol = getSymbol();
-const wallet_increment = 0;
 const min_notional = 5;
 const price_filter = 0.01000000;
 const lot_size = 0.00001000;
@@ -67,7 +66,7 @@ ws_api.on("message", async (data) => {
         last_trade.time = trade.E;
         last_trade.price = parseFloat(trade.p);
         last_trade.price_executed = parseFloat(trade.L);
-        last_trade.wallet_target += wallet_increment;
+        last_trade.wallet_target += WALLET_INCREMENT;
         last_trade.base_required = last_trade.wallet_target / last_trade.price;
         last_trade.base_to_buy = parseFloat(trade.S === "BUY" ? trade.q : -trade.q);
         last_trade.base_to_buy_fee = (trade.N === symbol.base ? parseFloat(trade.n) : 0);
@@ -140,7 +139,7 @@ ws_stream.on("message", (data) => {
 
       const price = parseFloat(parsedData.p);
 
-      const wallet_target = last_trade.wallet_target + wallet_increment;
+      const wallet_target = last_trade.wallet_target + WALLET_INCREMENT;
       const base_required = wallet_target / price;
       const base_to_buy = parseFloat((Math.round((base_required - last_trade.base_owned) / lot_size) * lot_size).toFixed(-Math.log10(lot_size)));
       const side = base_to_buy > 0 ? "BUY" : "SELL";

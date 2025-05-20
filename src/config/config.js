@@ -6,6 +6,9 @@ const result = dotenv.config({
   path: [`src/config/.env.${nodeEnv}`]
 });
 
+result.parsed["DELTA"] = parseFloat(result.parsed["DELTA"]);
+result.parsed["WALLET_INCREMENT"] = parseFloat(result.parsed["WALLET_INCREMENT"]);
+
 export const {
   HMAC_SHA_256_API_KEY,
   HMAC_SHA_256_SECRET_KEY,
@@ -20,4 +23,5 @@ export const {
   SYMBOL_BASE,
   SYMBOL_QUOTE,
   DELTA,
+  WALLET_INCREMENT
 } = result.parsed;
