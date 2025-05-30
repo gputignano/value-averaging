@@ -8,6 +8,9 @@ const price_filter = 0.01000000;
 const lot_size = 0.00001000;
 let isProcessing = false;
 
+// Add tracking for partial orders
+let partialOrderFees = new Map(); // Track accumulated fees per order ID
+
 const last_trade = await getLastTrade(WEB_APP_URL);
 
 const ws_api = createBinanceSocket(WEBSOCKET_API_ENDPOINT);
@@ -61,44 +64,83 @@ ws_api.on("message", async (data) => {
 
       if (trade.s !== symbol.base + symbol.quote) return;
 
-      if (trade.X === "FILLED") {
-        last_trade.side = trade.S;
-        last_trade.time = trade.E;
-        last_trade.price = parseFloat(trade.p);
-        last_trade.price_executed = parseFloat(trade.L);
-        last_trade.wallet_target += WALLET_INCREMENT;
-        last_trade.base_required = last_trade.wallet_target / last_trade.price;
-        last_trade.base_to_buy = parseFloat(trade.S === "BUY" ? trade.q : -trade.q);
-        last_trade.base_to_buy_fee = (trade.N === symbol.base ? parseFloat(trade.n) : 0);
-        last_trade.base_owned += last_trade.base_to_buy - last_trade.base_to_buy_fee;
-        last_trade.quote_spent = parseFloat(trade.S === "BUY" ? -trade.Z : trade.Z);
-        last_trade.quote_spent_fee = (trade.N === symbol.quote ? parseFloat(trade.n) : 0);
-        last_trade.quote_spent_sum += last_trade.quote_spent - last_trade.quote_spent_fee;
-        last_trade.buffer = last_trade.wallet_target + last_trade.quote_spent_sum;
+      if (trade.X === "PARTIALLY_FILLED" || trade.X === "FILLED") {
+        const orderId = trade.i;
 
-        const response = await saveTrade(WEB_APP_URL, {
-          side: last_trade.side,
-          time: last_trade.time,
-          id: trade.i,
-          price: last_trade.price,
-          price_executed: last_trade.price_executed,
-          wallet_target: last_trade.wallet_target,
-          base_required: last_trade.base_required,
-          base_to_buy: last_trade.base_to_buy,
-          base_to_buy_fee: last_trade.base_to_buy_fee,
-          base_owned: last_trade.base_owned,
-          quote_spent: last_trade.quote_spent,
-          quote_spent_fee: last_trade.quote_spent_fee,
-          quote_spent_sum: last_trade.quote_spent_sum,
-          buffer: last_trade.buffer
-        });
+        // Initialize order tracking if not exists
+        if (!partialOrderFees.has(orderId)) {
+          partialOrderFees.set(orderId, {
+            baseFeeTotal: 0,
+            quoteFeeTotal: 0,
+            baseQuantityTotal: 0,
+            quoteValueTotal: 0
+          });
+        }
 
-        console.log(response.data);
+        const orderData = partialOrderFees.get(orderId);
 
-        isProcessing = false;
+        // Accumulate fees and quantities for this execution
+        const currentBaseFee = (trade.N === symbol.base ? parseFloat(trade.n) : 0);
+        const currentQuoteFee = (trade.N === symbol.quote ? parseFloat(trade.n) : 0);
+        const currentBaseQuantity = parseFloat(trade.l); // Last executed quantity
+        const currentQuoteValue = parseFloat(trade.Y); // Last executed quote asset transacted quantity
+
+        orderData.baseFeeTotal += currentBaseFee;
+        orderData.quoteFeeTotal += currentQuoteFee;
+        orderData.baseQuantityTotal += currentBaseQuantity;
+        orderData.quoteValueTotal += currentQuoteValue;
+
+        // Only process final update when order is FILLED
+        if (trade.X === "FILLED") {
+          last_trade.side = trade.S;
+          last_trade.time = trade.E;
+          last_trade.price = parseFloat(trade.p);
+          last_trade.price_executed = parseFloat(trade.L);
+          last_trade.wallet_target += WALLET_INCREMENT;
+          last_trade.base_required = last_trade.wallet_target / last_trade.price;
+
+          // Use accumulated totals instead of just the last trade
+          last_trade.base_to_buy = parseFloat(trade.S === "BUY" ? trade.z : -trade.z);
+          last_trade.base_to_buy_fee = orderData.baseFeeTotal; // Total base fees for the order
+          last_trade.base_owned += last_trade.base_to_buy - last_trade.base_to_buy_fee;
+          last_trade.quote_spent = parseFloat(trade.S === "BUY" ? -trade.Z : trade.Z);
+          last_trade.quote_spent_fee = orderData.quoteFeeTotal; // Total quote fees for the order
+          last_trade.quote_spent_sum += last_trade.quote_spent - last_trade.quote_spent_fee;
+          last_trade.buffer = last_trade.wallet_target + last_trade.quote_spent_sum;
+
+          const response = await saveTrade(WEB_APP_URL, {
+            side: last_trade.side,
+            time: last_trade.time,
+            id: trade.i,
+            price: last_trade.price,
+            price_executed: last_trade.price_executed,
+            wallet_target: last_trade.wallet_target,
+            base_required: last_trade.base_required,
+            base_to_buy: last_trade.base_to_buy,
+            base_to_buy_fee: last_trade.base_to_buy_fee,
+            base_owned: last_trade.base_owned,
+            quote_spent: last_trade.quote_spent,
+            quote_spent_fee: last_trade.quote_spent_fee,
+            quote_spent_sum: last_trade.quote_spent_sum,
+            buffer: last_trade.buffer
+          });
+
+          console.log(response.data);
+
+          // Clean up order tracking
+          partialOrderFees.delete(orderId);
+
+          isProcessing = false;
+        }
 
         return;
-      } else if (parsedData.event.X === "EXPIRED") {
+      } else if (parsedData.event.X === "EXPIRED" || parsedData.event.X === "CANCELED") {
+        // Clean up order tracking for expired/canceled orders
+        const orderId = trade.i;
+        if (partialOrderFees.has(orderId)) {
+          partialOrderFees.delete(orderId);
+        }
+
         isProcessing = false;
         return;
       }
