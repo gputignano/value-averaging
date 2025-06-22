@@ -1,5 +1,5 @@
 import createBinanceSocket from "./src/utils/webSocket.js";
-import { WEBSOCKET_STREAM_ENDPOINT, WEBSOCKET_API_ENDPOINT, ED25519_API_KEY, ED25519_PRIVATE_KEY, WEB_APP_URL, DELTA, WALLET_INCREMENT } from "./src/config/config.js";
+import { WEBSOCKET_STREAM_ENDPOINT, WEBSOCKET_API_ENDPOINT, ED25519_API_KEY, ED25519_PRIVATE_KEY, WEB_APP_URL, DELTA, WALLET_INCREMENT, STRATEGYTYPE } from "./src/config/config.js";
 import { sessionLogon, getLastTrade, saveTrade, getSymbol } from "./src/utils/functions.js";
 
 const symbol = getSymbol();
@@ -62,6 +62,7 @@ ws_api.on("message", async (data) => {
     case "executionReport":
       const trade = parsedData.event;
 
+      if (trade.J !== STRATEGYTYPE) return;
       if (trade.s !== symbol.base + symbol.quote) return;
 
       if (trade.X === "PARTIALLY_FILLED" || trade.X === "FILLED") {
@@ -201,6 +202,7 @@ ws_stream.on("message", (data) => {
             timeInForce: "FOK",
             price: price,
             quantity: Math.abs(base_to_buy),
+            strategyType: STRATEGYTYPE,
             timestamp: Date.now()
           }
         };
