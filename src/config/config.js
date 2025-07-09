@@ -24,6 +24,7 @@ export const {
   SYMBOL_BASE,
   SYMBOL_QUOTE,
   DELTA,
+  WALLET_TARGET,
   WALLET_INCREMENT,
   STRATEGYTYPE
 } = result.parsed;
