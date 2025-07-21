@@ -9,6 +9,7 @@ const result = dotenv.config({
 result.parsed["DELTA"] = parseFloat(result.parsed["DELTA"]);
 result.parsed["WALLET_INCREMENT"] = parseFloat(result.parsed["WALLET_INCREMENT"]);
 result.parsed["STRATEGYTYPE"] = parseInt(result.parsed["STRATEGYTYPE"]);
+result.parsed["WALLET_TARGET"] = parseFloat(result.parsed["WALLET_TARGET"]);
 
 export const {
   HMAC_SHA_256_API_KEY,
