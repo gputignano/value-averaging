@@ -3,7 +3,8 @@ import dotenv from 'dotenv';
 const nodeEnv = process.env.NODE_ENV || "development";
 
 const result = dotenv.config({
-  path: [`src/config/.env.${nodeEnv}`]
+  path: [`src/config/.env.${nodeEnv}`],
+  silent: true
 });
 
 result.parsed["DELTA"] = parseFloat(result.parsed["DELTA"]);
