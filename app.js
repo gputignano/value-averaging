@@ -186,11 +186,6 @@ ws_stream.on("message", (data) => {
       const side = base_to_buy > 0 ? "BUY" : "SELL";
       const quote_to_buy = base_to_buy * price;
 
-      /**
-       * TEMPORARY CODE; TO REMOVE ONCE THE LOGIC IS CORRECT
-       */
-      if (side === "SELL") return;
-
       if (Math.abs(quote_to_buy) >= min_notional && Math.abs((price - last_trade.price_executed) / (price >= last_trade.price_executed ? last_trade.price_executed : price)) >= DELTA) {
         // Execute the order
 
